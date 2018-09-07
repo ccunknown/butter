@@ -1,0 +1,83 @@
+import {PanelCtrl} from 'app/plugins/sdk';
+import moment from 'moment';
+import './css/toggle-checkbox.css!';
+
+var panelDefaults = {
+  panelTitle: 'Panel Title',
+  butter:[
+    {
+      butterType: 'button',
+      on:{
+        method: 'PUT',
+        url: '',
+        headers:{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body:'{"on":true}'
+      },
+      off:{
+        method: 'PUT',
+        url: '',
+        headers:{
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body:'{"on":false}'
+      }
+    }
+  ]
+};
+export class ClockCtrl extends PanelCtrl {
+
+  constructor($scope, $injector) {
+    super($scope, $injector);
+    _.defaultsDeep(this.panel, panelDefaults);
+    //this.updateClock();
+
+    this.headtxt = "";
+    this.butter();
+    this.updateClock();
+  }
+
+  updateClock() {
+    this.tea = "Label : "+this.headtxt;
+    this.$timeout(() => { this.updateClock(); }, 1000);
+  }
+
+  butter(){
+    if(this.butter1 && this.butter2)
+      this.headtxt = "Butter 1 and 2 checked";
+    else if(this.butter1)
+      this.headtxt = "Butter 1 checked";
+    else if(this.butter2)
+      this.headtxt = "Butter 2 checked";
+    else
+      this.headtxt = "No butter checked";
+
+    if(this.butter1)
+      this.putData(`https://httpillwww.mozilla-iot.org/things/http---192.168.43.62-things-lamp1/properties/on`, {on: true})
+        .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+        .catch(error => console.error(error));
+  }
+
+  putData(bindex = -1) {
+    if(butter == -1)
+      return ;
+  // Default options are marked with *
+    console.log("Body : "+this.panel.butter[0].on.body);
+    return fetch(url, {
+      method: "PUT", // *GET, POST, PUT, DELETE, etc.
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVkYWMzMWQzLWUxMjAtNGJiMy04NWQzLTdlNTYwOGNiNjBmMyJ9.eyJjbGllbnRfaWQiOiJsb2NhbC10b2tlbiIsInJvbGUiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZSI6Ii90aGluZ3M6cmVhZHdyaXRlIiwiaWF0IjoxNTM2MjA4MzI5fQ.d1f9-4LE7KJTDr6b04xAynwHdGl_TZCYhQTsurYR4dPH5KFUXLpzwrUrokODzelam8M1EmemB_AYzVNC9dHyCw"
+      },
+      body: this.panel.butter[0].on.body // body data type must match "Content-Type" header
+      //body: JSON.stringify(data) // body data type must match "Content-Type" header
+    })
+    .then(response => response.json()); // parses response to JSON
+  }
+}
+
+ClockCtrl.templateUrl = 'module.html';

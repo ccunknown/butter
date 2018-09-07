@@ -3,10 +3,10 @@ import moment from 'moment';
 import './css/toggle-checkbox.css!';
 
 var panelDefaults = {
-  title: 'Panel Title',
+  panelTitle: 'Panel Title',
   butter:[
     {
-      butterType: 'on/off button',
+      butterType: 'button',
       on:[
         {
           method: 'PUT',
@@ -55,64 +55,13 @@ export class ClockCtrl extends PanelCtrl {
 
     this.headtxt = "";
     this.butterstate = {};
-    this.edmShowButter = [];
-    this.edmShowButterOn = false;
-    this.edmShowButterOff = false;
-    this.edmRequestIndex = -1;
     //this.butter();
-
-    this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
-    //this.events.on('panel-initialized', this.render.bind(this));
-
-    this.updateButter();
+    this.updateClock();
   }
 
-  onInitEditMode(){
-    this.init_edmShowButter();
-    this.addEditorTab('Options', 'public/plugins/grafana-butter-panel/editor.html', 2);
-  }
-
-  init_edmShowButter(){
-    this.edmShowButter = [];
-    var len = this.panel.butter.length;
-    for(var i = 0;i < len;i++){
-      this.edmShowButter[i] = false;
-    }
-  }
-
-  edmToggleButter(index){
-    this.edmRequestIndex = -1;
-    this.edmShowButterOn = false;
-    this.edmShowButterOff = false;
-    this.edmShowButter[index] = !this.edmShowButter[index];
-    console.log("edmToggleButter > "+this.edmShowButter[index]);
-  }
-
-  edmToggleButterOn(){
-    this.edmRequestIndex = -1;
-    this.edmShowButterOn = !this.edmShowButterOn;
-    console.log("edmShowButterOn > "+this.edmShowButterOn);
-  }
-
-  edmToggleButterOff(){
-    this.edmRequestIndex = -1;
-    this.edmShowButterOff = !this.edmShowButterOff;
-    console.log("edmShowButterOff > "+this.edmShowButterOff);
-  }
-
-  edmToggleRequest(index){
-    if(this.edmRequestIndex == index){
-      this.edmRequestIndex = -1;
-    }
-    else{
-      this.edmRequestIndex = index;
-    }
-    console.log("edmRequestIndex > "+this.edmRequestIndex);
-  }
-
-  updateButter() {
+  updateClock() {
     this.tea = "Label : "+this.headtxt;
-    this.$timeout(() => { this.updateButter(); }, 1000);
+    this.$timeout(() => { this.updateClock(); }, 1000);
   }
 
   butter(bindex) {
