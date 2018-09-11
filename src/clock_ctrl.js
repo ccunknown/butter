@@ -7,6 +7,7 @@ var panelDefaults = {
   butter:[
     {
       butterType: 'on/off button',
+      label: 'Label 0',
       on:[
         {
           method: 'PUT',
@@ -45,7 +46,6 @@ var panelDefaults = {
   ]
 };
 
-
 export class ClockCtrl extends PanelCtrl {
 
   constructor($scope, $injector) {
@@ -55,7 +55,7 @@ export class ClockCtrl extends PanelCtrl {
 
     this.headtxt = "";
     this.butterstate = {};
-    this.edmShowButter = [];
+    this.edmShowButter = -1;
     this.edmShowButterOn = false;
     this.edmShowButterOff = false;
     this.edmRequestIndex = -1;
@@ -73,30 +73,33 @@ export class ClockCtrl extends PanelCtrl {
   }
 
   init_edmShowButter(){
-    this.edmShowButter = [];
-    var len = this.panel.butter.length;
-    for(var i = 0;i < len;i++){
-      this.edmShowButter[i] = false;
-    }
+    this.edmShowButter = -1;
   }
 
   edmToggleButter(index){
     this.edmRequestIndex = -1;
     this.edmShowButterOn = false;
     this.edmShowButterOff = false;
-    this.edmShowButter[index] = !this.edmShowButter[index];
-    console.log("edmToggleButter > "+this.edmShowButter[index]);
+    if(this.edmShowButter == index)
+      this.edmShowButter = -1;
+    else
+      this.edmShowButter = index;
+    console.log("edmToggleButter > "+this.edmShowButter);
   }
 
   edmToggleButterOn(){
     this.edmRequestIndex = -1;
     this.edmShowButterOn = !this.edmShowButterOn;
+    if(this.edmShowButterOn)
+      this.edmShowButterOff = false;
     console.log("edmShowButterOn > "+this.edmShowButterOn);
   }
 
   edmToggleButterOff(){
     this.edmRequestIndex = -1;
     this.edmShowButterOff = !this.edmShowButterOff;
+    if(this.edmShowButterOff)
+      this.edmShowButterOn = false;
     console.log("edmShowButterOff > "+this.edmShowButterOff);
   }
 
@@ -113,6 +116,96 @@ export class ClockCtrl extends PanelCtrl {
   updateButter() {
     this.tea = "Label : "+this.headtxt;
     this.$timeout(() => { this.updateButter(); }, 1000);
+  }
+
+  removeButter(index) {
+    console.log("Remove Butter "+index);
+    this.panel.butter.splice(index, 1);
+  }
+
+  addButter(){
+    console.log("Add Butter ");
+    this.panel.butter.push(
+      {
+        butterType:'on/off button',
+        label:'',
+        on:[],
+        off:[]
+      });
+  }
+
+  addRequest(bindex, mode){
+    if(mode == 'on'){
+      console.log('Add new on request of butter'+bindex);
+      this.panel.butter[bindex].on.push(
+        {
+          method: 'GET',
+          url: '',
+          headers:{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': ''
+          },
+          body:''
+        }
+      );
+    }
+    else{
+      console.log('Add new off request of butter'+bindex);
+      this.panel.butter[bindex].off.push(
+        {
+          method: 'GET',
+          url: '',
+          headers:{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': ''
+          },
+          body:''
+        }
+      );
+    }
+  }
+
+  removeRequest(bindex, mode, index){
+    if(mode == 'on'){
+      console.log('Remove on request of butter'+bindex);
+      this.panel.butter[bindex].on.splice(index, 1);
+    }
+    else{
+      console.log('Remove off request of butter'+bindex);
+      this.panel.butter[bindex].off.splice(index, 1);
+    }
+  }
+
+  addRequestHeader(bindex, mode, index, headerkey, headervalue){
+    console.log("Add request header");
+    console.log("> bindex : "+bindex);
+    console.log("> mode : "+mode);
+    console.log("> index : "+index);
+    console.log("> headerkey : "+headerkey);
+    console.log("> headervalue : "+headervalue);
+
+    if(headerkey == undefined || headerkey == '')
+      return ;
+
+    if(mode == 'on')
+      this.panel.butter[bindex].on[index].headers[headerkey] = headervalue;
+    else
+      this.panel.butter[bindex].off[index].headers[headerkey] = headervalue;
+  }
+
+  removeRequestHeader(bindex, mode, index, headerkey){
+    console.log("Remove request header "+index);
+    console.log("> bindex : "+bindex);
+    console.log("> mode : "+mode);
+    console.log("> index : "+index);
+    console.log("> headerkey : "+headerkey);
+
+    if(mode == 'on')
+      delete this.panel.butter[bindex].on[index].headers[headerkey];
+    else
+      delete this.panel.butter[bindex].off[index].headers[headerkey];
   }
 
   butter(bindex) {
@@ -143,8 +236,15 @@ export class ClockCtrl extends PanelCtrl {
   sendRequest(bindex, cindex){
     console.log("butterstatus : "+this.butterstate[bindex]);
     console.log("cindex : "+cindex);
+
+    console.log("Make Request : "+JSON.stringify(this.panel.butter[bindex].on[cindex]));
+    console.log("Default Request : "+JSON.stringify(panelDefaults.butter[0].on[0]));
+    console.log("Body : "+JSON.stringify(this.panel.butter[bindex].on[cindex].body));
+
     if(this.butterstate[bindex]){
       console.log("In true condition.");
+      if(this.panel.butter[bindex].on[cindex].url == '')
+        return ;
       return fetch(this.panel.butter[bindex].on[cindex].url, {
         method: this.panel.butter[bindex].on[cindex].method, // *GET, POST, PUT, DELETE, etc.
         headers: this.panel.butter[bindex].on[cindex].headers,
@@ -155,6 +255,8 @@ export class ClockCtrl extends PanelCtrl {
     }
     else{
       console.log("In false condition.");
+      if(this.panel.butter[bindex].off[cindex].url == '')
+        return ;
       return fetch(this.panel.butter[bindex].off[cindex].url, {
         method: this.panel.butter[bindex].off[cindex].method, // *GET, POST, PUT, DELETE, etc.
         headers: this.panel.butter[bindex].off[cindex].headers,
@@ -166,3 +268,4 @@ export class ClockCtrl extends PanelCtrl {
 }
 
 ClockCtrl.templateUrl = 'module.html';
+

@@ -1,7 +1,16 @@
-<h3>{{ctrl.tea}}</h3>
-<div ng-repeat="bt in ctrl.panel.butter">
-  <label class="switch">
-    <input type="checkbox" ng-model="ctrl.butterstate[$index]" ng-change="ctrl.butter($index)">
-    <span class="slider round"></span>
-  </label>
+<div ng-repeat="bt in ctrl.panel.butter" style="vertical-align:middle;">
+	<table>
+		<tr>
+			<td>
+				<label class="switch">
+					<input type="checkbox" ng-model="ctrl.butterstate[$index]" ng-change="ctrl.butter($index)">
+					<span class="slider round"></span>
+				</label>
+			</td>
+			<td valign="middle">
+				&nbsp;&nbsp;&nbsp;&nbsp;<font size="4" style="padding-bottom: 10px;">{{bt.label}}</font>
+			</td>
+		</tr>
+	</table>
 </div>
+

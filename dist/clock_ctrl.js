@@ -64,6 +64,7 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
         title: 'Panel Title',
         butter: [{
           butterType: 'on/off button',
+          label: 'Label 0',
           on: [{
             method: 'PUT',
             url: 'https://httpillwww.mozilla-iot.org/things/http---192.168.43.62-things-lamp1/properties/on',
@@ -109,7 +110,7 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
 
           _this.headtxt = "";
           _this.butterstate = {};
-          _this.edmShowButter = [];
+          _this.edmShowButter = -1;
           _this.edmShowButterOn = false;
           _this.edmShowButterOff = false;
           _this.edmRequestIndex = -1;
@@ -131,11 +132,7 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
         }, {
           key: 'init_edmShowButter',
           value: function init_edmShowButter() {
-            this.edmShowButter = [];
-            var len = this.panel.butter.length;
-            for (var i = 0; i < len; i++) {
-              this.edmShowButter[i] = false;
-            }
+            this.edmShowButter = -1;
           }
         }, {
           key: 'edmToggleButter',
@@ -143,14 +140,15 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
             this.edmRequestIndex = -1;
             this.edmShowButterOn = false;
             this.edmShowButterOff = false;
-            this.edmShowButter[index] = !this.edmShowButter[index];
-            console.log("edmToggleButter > " + this.edmShowButter[index]);
+            if (this.edmShowButter == index) this.edmShowButter = -1;else this.edmShowButter = index;
+            console.log("edmToggleButter > " + this.edmShowButter);
           }
         }, {
           key: 'edmToggleButterOn',
           value: function edmToggleButterOn() {
             this.edmRequestIndex = -1;
             this.edmShowButterOn = !this.edmShowButterOn;
+            if (this.edmShowButterOn) this.edmShowButterOff = false;
             console.log("edmShowButterOn > " + this.edmShowButterOn);
           }
         }, {
@@ -158,6 +156,7 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
           value: function edmToggleButterOff() {
             this.edmRequestIndex = -1;
             this.edmShowButterOff = !this.edmShowButterOff;
+            if (this.edmShowButterOff) this.edmShowButterOn = false;
             console.log("edmShowButterOff > " + this.edmShowButterOff);
           }
         }, {
@@ -179,6 +178,88 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
             this.$timeout(function () {
               _this2.updateButter();
             }, 1000);
+          }
+        }, {
+          key: 'removeButter',
+          value: function removeButter(index) {
+            console.log("Remove Butter " + index);
+            this.panel.butter.splice(index, 1);
+          }
+        }, {
+          key: 'addButter',
+          value: function addButter() {
+            console.log("Add Butter ");
+            this.panel.butter.push({
+              butterType: 'on/off button',
+              label: '',
+              on: [],
+              off: []
+            });
+          }
+        }, {
+          key: 'addRequest',
+          value: function addRequest(bindex, mode) {
+            if (mode == 'on') {
+              console.log('Add new on request of butter' + bindex);
+              this.panel.butter[bindex].on.push({
+                method: 'GET',
+                url: '',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'Authorization': ''
+                },
+                body: ''
+              });
+            } else {
+              console.log('Add new off request of butter' + bindex);
+              this.panel.butter[bindex].off.push({
+                method: 'GET',
+                url: '',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'Authorization': ''
+                },
+                body: ''
+              });
+            }
+          }
+        }, {
+          key: 'removeRequest',
+          value: function removeRequest(bindex, mode, index) {
+            if (mode == 'on') {
+              console.log('Remove on request of butter' + bindex);
+              this.panel.butter[bindex].on.splice(index, 1);
+            } else {
+              console.log('Remove off request of butter' + bindex);
+              this.panel.butter[bindex].off.splice(index, 1);
+            }
+          }
+        }, {
+          key: 'addRequestHeader',
+          value: function addRequestHeader(bindex, mode, index, headerkey, headervalue) {
+            console.log("Add request header");
+            console.log("> bindex : " + bindex);
+            console.log("> mode : " + mode);
+            console.log("> index : " + index);
+            console.log("> headerkey : " + headerkey);
+            console.log("> headervalue : " + headervalue);
+
+            if (headerkey == undefined || headerkey == '') return;
+
+            if (mode == 'on') this.panel.butter[bindex].on[index].headers[headerkey] = headervalue;else this.panel.butter[bindex].off[index].headers[headerkey] = headervalue;
+          }
+        }, {
+          key: 'removeRequestHeader',
+          value: function removeRequestHeader(bindex, mode, index, headerkey) {
+            console.log("Remove request header " + index);
+            console.log("> bindex : " + bindex);
+            console.log("> mode : " + mode);
+            console.log("> index : " + index);
+            console.log("> headerkey : " + headerkey);
+
+            if (mode == 'on') delete this.panel.butter[bindex].on[index].headers[headerkey];else delete this.panel.butter[bindex].off[index].headers[headerkey];
           }
         }, {
           key: 'butter',
@@ -209,8 +290,14 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
           value: function sendRequest(bindex, cindex) {
             console.log("butterstatus : " + this.butterstate[bindex]);
             console.log("cindex : " + cindex);
+
+            console.log("Make Request : " + JSON.stringify(this.panel.butter[bindex].on[cindex]));
+            console.log("Default Request : " + JSON.stringify(panelDefaults.butter[0].on[0]));
+            console.log("Body : " + JSON.stringify(this.panel.butter[bindex].on[cindex].body));
+
             if (this.butterstate[bindex]) {
               console.log("In true condition.");
+              if (this.panel.butter[bindex].on[cindex].url == '') return;
               return fetch(this.panel.butter[bindex].on[cindex].url, {
                 method: this.panel.butter[bindex].on[cindex].method, // *GET, POST, PUT, DELETE, etc.
                 headers: this.panel.butter[bindex].on[cindex].headers,
@@ -221,6 +308,7 @@ System.register(['app/plugins/sdk', 'moment', './css/toggle-checkbox.css!'], fun
               }); // parses response to JSON
             } else {
               console.log("In false condition.");
+              if (this.panel.butter[bindex].off[cindex].url == '') return;
               return fetch(this.panel.butter[bindex].off[cindex].url, {
                 method: this.panel.butter[bindex].off[cindex].method, // *GET, POST, PUT, DELETE, etc.
                 headers: this.panel.butter[bindex].off[cindex].headers,

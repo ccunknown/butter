@@ -2,105 +2,137 @@
 <!--  -->
 	<!--div class="section gf-form-group"-->
 		<h5 class="section-heading">Butter option</h5>
-		<div ng-repeat="butter in ctrl.panel.butter">
+		<div ng-repeat="butter in ctrl.panel.butter" ng-init="butterIndex = $index">
 
 			<div class="gf-form-query">
 				<!--div class="gf-form gf-form--grow"-->
 				<div class="gf-form gf-form-query-letter-cell">
 					<!--label class="gf-form-label gf-form-label--grow"-->
 					<label class="gf-form-label" ng-click="ctrl.edmToggleButter($index)">
-							<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButter[$index]"></i>
-							<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButter[$index]"></i>
+							<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButter == $index"></i>
+							<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButter == $index"></i>
 							Butter {{$index}}
 					</label>
 				</div>
 				&nbsp;
-				<div class="gf-form-query-content gf-form-query-content--collapsed" ng-if="!ctrl.edmShowButter[$index]">
+				<div class="gf-form-query-content gf-form-query-content--collapsed" ng-if="ctrl.edmShowButter != $index">
 					<div class="gf-form">
 						<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButter($index)">
-							Type:{{butter.butterType}};
+							Type:{{butter.butterType}}, Label:{{butter.label}};
 						</label>
 					</div>
 				</div>
-				<div class="gf-form-query-content gf-form-query-content--collapsed" ng-if="ctrl.edmShowButter[$index]">
+				<div class="gf-form-query-content gf-form-query-content--collapsed" ng-if="ctrl.edmShowButter == $index">
 					<div class="gf-form">
 						<label class="gf-form-label width-9">Butter Mode</label>
 						<div class="gf-form-select-wrapper max-width-10">
-							<select class="input-medium gf-form-input" ng-model="rq.butterType" ng-options="t for t in ['on/off button']">
+							<select class="input-medium gf-form-input" ng-model="butter.butterType" ng-options="t for t in ['on/off button']">
 							</select>
 						</div>
 					</div>
 					<div class="gf-form gf-form--grow">
-						<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButterOn()">
-							<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButterOn"></i>
-							<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButterOn"></i>
-							ON
-						</label>
+						<div class="gf-form gf-form--grow">
+							<label class="gf-form-label max-width-6">Label</label>
+							<input type="text" class="input-small gf-form-input" ng-model="butter.label" ng-model-onblur=true/>
+						</div>
 					</div>
-					<div ng-if="ctrl.edmShowButterOn">
-						<div class="offset-width-3" ng-repeat="on in butter.on">
-							<div class="gf-form-inline">
-								<div class="gf-form gf-form--grow gf-form-query-letter-cell">
-									<!--label class="gf-form-label gf-form-label--grow"-->
-									<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleRequest($index)">
-										<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmRequestIndex == $index"></i>
-										<i class="fa fa-caret-right" ng-hide="ctrl.edmRequestIndex == $index"></i>
-										Request {{$index}} > METHOD : {{on.method}}, URL : {{on.url}};
-									</label>
-								</div>
-								&nbsp;
-								<div class="gf-form">
-									<label class="gf-form-label">
-										<a class="pointer" ng-click="ctrl.ButterRemove($index)">
-											<i class="fa fa-trash"/>
-										</a>
-									</label>
-								</div>
-							</div>
-							<div class="offset-width-3" ng-if="ctrl.edmRequestIndex == $index">
+					<div ng-repeat="(bkey,bdata) in butter" ng-if="bkey == 'on' || bkey == 'off'">
+						<div class="gf-form gf-form--grow" ng-if="bkey == 'on'">
+							<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButterOn()">
+								<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButterOn"></i>
+								<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButterOn"></i>
+								ON
+							</label>
+						</div>
+						<div class="gf-form gf-form--grow" ng-if="bkey == 'off'">
+							<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButterOff()">
+								<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButterOff"></i>
+								<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButterOff"></i>
+								OFF
+							</label>
+						</div>
+						<div ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off')">
+							<!--div class="offset-width-3" ng-repeat="on in butter.on"-->
+							<div class="offset-width-3" ng-repeat="on in bdata" ng-init="requestIndex = $index">
 								<div class="gf-form-inline">
-									<div class="gf-form">
-										<label class="gf-form-label width-6">Method</label>
-										<div class="gf-form-select-wrapper max-width-10">
-											<select class="input-medium gf-form-input" ng-model="on.method" ng-options="t for t in ['GET','POST','PUT','DELETE','PATCH']">
-											</select>
-										</div>
+									<div class="gf-form gf-form--grow gf-form-query-letter-cell">
+										<!--label class="gf-form-label gf-form-label--grow"-->
+										<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleRequest($index)">
+											<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmRequestIndex == $index"></i>
+											<i class="fa fa-caret-right" ng-hide="ctrl.edmRequestIndex == $index"></i>
+											Request {{$index}} > METHOD : {{on.method}}, URL : {{on.url}};
+										</label>
 									</div>
 									&nbsp;
-									<div class="gf-form gf-form--grow">
-										<label class="gf-form-label max-width-6">Url</label>
-										<input type="text" class="input-small gf-form-input" ng-model="on.url" ng-model-onblur=true/>
+									<div class="gf-form">
+										<label class="gf-form-label">
+											<a class="pointer" ng-click="ctrl.removeRequest(butterIndex,bkey,$index)">
+												<i class="fa fa-trash"/>
+											</a>
+										</label>
 									</div>
 								</div>
-
-								<div>
-									<div class="gf-form gf-form--grow">
-										<label class="gf-form-label gf-form-label--grow">Headers</label>
+								<div class="offset-width-3" ng-if="ctrl.edmRequestIndex == $index">
+									<div class="gf-form-inline">
 										<div class="gf-form">
-											<label class="gf-form-label">
-												<a class="pointer" ng-click="ctrl.onEditorAddCheck()">
-													Add 
-												</a>
-											</label>
+											<label class="gf-form-label width-6">Method</label>
+											<div class="gf-form-select-wrapper max-width-10">
+												<select class="input-medium gf-form-input" ng-model="on.method" ng-options="t for t in ['GET','POST','PUT','DELETE','PATCH']">
+												</select>
+											</div>
+										</div>
+										&nbsp;
+										<div class="gf-form gf-form--grow">
+											<label class="gf-form-label max-width-6">Url</label>
+											<input type="text" class="input-small gf-form-input" ng-model="on.url" ng-model-onblur=true/>
 										</div>
 									</div>
-									<div class="gf-form gf-form--grow offset-width-3" ng-repeat="(key, value) in on.headers">
-										<input type="text" class="input-small gf-form-input width-10" ng-model="key" ng-model-onblur=true/>
-										<input type="text" class="input-small gf-form-input" ng-model="value" ng-model-onblur=true/>
-										<div class="gf-form">
-											<label class="gf-form-label">
-												<a class="pointer" ng-click="ctrl.onEditorRemoveRequest($index)">
-													<i class="fa fa-trash"/>
-												</a>
-											</label>
+
+									<div>
+										<div class="gf-form gf-form--grow">
+											<label class="gf-form-label">Headers</label>
+										</div>
+										<div class="gf-form gf-form--grow offset-width-3" ng-repeat="(key, value) in on.headers">
+											<input type="text" class="input-small gf-form-input width-10" ng-model="key" ng-model-onblur=true/>
+											<input type="text" class="input-small gf-form-input" ng-model="value" ng-model-onblur=true/>
+											&nbsp;
+											<div class="gf-form">
+												<label class="gf-form-label">
+													<a class="pointer" ng-click="ctrl.removeRequestHeader(butterIndex, bkey, requestIndex, key)">
+														<i class="fa fa-trash"/>
+													</a>
+												</label>
+											</div>
+										</div>
+										<div class="gf-form gf-form--grow offset-width-3">
+											<input type="text" class="input-small gf-form-input width-10" ng-model="headerkey" ng-model-onblur=true/>
+											<input type="text" class="input-small gf-form-input" ng-model="headervalue" ng-model-onblur=true/>
+											&nbsp;
+											<div class="gf-form">
+												<label class="gf-form-label">
+													<a class="pointer" ng-click="ctrl.addRequestHeader(butterIndex, bkey, requestIndex, headerkey, headervalue)">
+														<i class="fa fa-plus"/>
+													</a>
+												</label>
+											</div>
 										</div>
 									</div>
-								</div>
 
-								<div class="gf-form gf-form--grow">
-									<label class="gf-form-label width-6">Body</label>
-									<input type="text" class="input-small gf-form-input" ng-model="on.body" ng-model-onblur=true/>
+									<div class="gf-form gf-form--grow">
+										<label class="gf-form-label width-6">Body</label>
+										<input type="text" class="input-small gf-form-input" ng-model="on.body" ng-model-onblur=true/>
+									</div>
 								</div>
+							</div>
+						</div>
+						<div class="gf-form"  ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off')">
+							<div class="offset-width-3">
+								<label class="gf-form-label">
+									<a class="pointer" ng-click="ctrl.addRequest(butterIndex,bkey)">
+										<i class="fa fa-plus"/>
+										Add Request
+									</a>
+								</label>
 							</div>
 						</div>
 					</div>
@@ -108,13 +140,31 @@
 				&nbsp;
 				<div class="gf-form">
 					<label class="gf-form-label">
-						<a class="pointer" ng-click="ctrl.ButterRemove($index)">
+						<a class="pointer" ng-click="ctrl.removeButter($index)">
 							<i class="fa fa-trash"/>
 						</a>
 					</label>
 				</div>
+			</div>			
+		</div>
+
+		<div class="gf-form-query">
+			<div class="gf-form gf-form-query-letter-cell">
+				<label class="gf-form-label">
+						<i class="fa fa-caret-right"></i>
+						Butter {{ctrl.panel.butter.length}}
+				</label>
+			</div>
+			&nbsp;
+			<div class="gf-form">
+				<label class="gf-form-label">
+					<a class="pointer" ng-click="ctrl.addButter()">
+						<i class="fa fa-plus"/>
+					</a>
+				</label>
 			</div>
 		</div>
 	<!--/div-->
 <!--  -->
 </div>
+
