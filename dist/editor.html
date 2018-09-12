@@ -9,9 +9,11 @@
 				<div class="gf-form gf-form-query-letter-cell">
 					<!--label class="gf-form-label gf-form-label--grow"-->
 					<label class="gf-form-label" ng-click="ctrl.edmToggleButter($index)">
+						<span class="gf-form-query-letter-cell-carret">
 							<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButter == $index"></i>
 							<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButter == $index"></i>
-							Butter {{$index}}
+						</span>
+						Butter {{$index}}
 					</label>
 				</div>
 				&nbsp;
@@ -36,7 +38,7 @@
 							<input type="text" class="input-small gf-form-input" ng-model="butter.label" ng-model-onblur=true/>
 						</div>
 					</div>
-					<div ng-repeat="(bkey,bdata) in butter" ng-if="bkey == 'on' || bkey == 'off'">
+					<div ng-repeat="(bkey,bdata) in butter" ng-if="bkey == 'on' || bkey == 'off' || bkey == 'initial'">
 						<div class="gf-form gf-form--grow" ng-if="bkey == 'on'">
 							<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButterOn()">
 								<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButterOn"></i>
@@ -51,7 +53,14 @@
 								OFF
 							</label>
 						</div>
-						<div ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off')">
+						<div class="gf-form gf-form--grow" ng-if="bkey == 'initial'">
+							<label class="gf-form-label pointer gf-form-label--grow" ng-click="ctrl.edmToggleButterInitial()">
+								<i class="fa fa-caret-down ng-hide" ng-show="ctrl.edmShowButterInitial"></i>
+								<i class="fa fa-caret-right" ng-hide="ctrl.edmShowButterInitial"></i>
+								Initial
+							</label>
+						</div>
+						<div ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off') || (ctrl.edmShowButterInitial && bkey=='initial')">
 							<!--div class="offset-width-3" ng-repeat="on in butter.on"-->
 							<div class="offset-width-3" ng-repeat="on in bdata" ng-init="requestIndex = $index">
 								<div class="gf-form-inline">
@@ -118,14 +127,19 @@
 										</div>
 									</div>
 
-									<div class="gf-form gf-form--grow">
+									<div class="gf-form gf-form--grow" ng-if="bkey != 'initial'">
 										<label class="gf-form-label width-6">Body</label>
 										<input type="text" class="input-small gf-form-input" ng-model="on.body" ng-model-onblur=true/>
+									</div>
+
+									<div class="gf-form gf-form--grow" ng-if="bkey == 'initial'">
+										<label class="gf-form-label width-6">On string</label>
+										<input type="text" class="input-small gf-form-input" ng-model="on.onstring" ng-model-onblur=true/>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="gf-form"  ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off')">
+						<div class="gf-form"  ng-if="(ctrl.edmShowButterOn && bkey=='on') || (ctrl.edmShowButterOff && bkey=='off') || (ctrl.edmShowButterInitial && bkey=='initial')">
 							<div class="offset-width-3">
 								<label class="gf-form-label">
 									<a class="pointer" ng-click="ctrl.addRequest(butterIndex,bkey)">
@@ -151,8 +165,10 @@
 		<div class="gf-form-query">
 			<div class="gf-form gf-form-query-letter-cell">
 				<label class="gf-form-label">
+					<span class="gf-form-query-letter-cell-carret">
 						<i class="fa fa-caret-right"></i>
-						Butter {{ctrl.panel.butter.length}}
+					</span>
+					Butter {{ctrl.panel.butter.length}}
 				</label>
 			</div>
 			&nbsp;
